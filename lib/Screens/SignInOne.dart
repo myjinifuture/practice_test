@@ -1,6 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:loginui/Screens/signUpPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../Common/Constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-class SignInOne extends StatelessWidget {
+import 'dashBoard.dart';
+
+class SignInOne extends StatefulWidget {
+
+  @override
+  _SignInOneState createState() => _SignInOneState();
+}
+
+class _SignInOneState extends State<SignInOne> {
+
+  @override
+  void initState() {
+   getLocalData();
+  }
+
+  String name="",password="";
+
+  TextEditingController txtName = new TextEditingController();
+
+  TextEditingController txtPassword = new TextEditingController();
+
+  getLocalData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    name = prefs.getString(Session.Name);
+    password = prefs.getString(Session.Password);
+    print(name);
+    print(password);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -30,6 +63,7 @@ class SignInOne extends StatelessWidget {
                   child: Container(
                     color: Color(0xfff5f5f5),
                     child: TextFormField(
+                      controller: txtName,
                       style: TextStyle(
                         color: Colors.black,
                         fontFamily: 'SFUIDisplay'
@@ -48,6 +82,7 @@ class SignInOne extends StatelessWidget {
                 Container(
                   color: Color(0xfff5f5f5),
                   child: TextFormField(
+                    controller: txtPassword,
                     obscureText: true,
                     style: TextStyle(
                       color: Colors.black,
@@ -66,7 +101,28 @@ class SignInOne extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(top: 20),
                   child: MaterialButton(
-                    onPressed: (){},//since this is only a UI app
+                    onPressed: (){
+                      if(txtName.text == "" || txtPassword.text == ""){
+                        Fluttertoast.showToast(
+                            msg: "Please fill all the fields",
+                            backgroundColor: Colors.red,
+                            gravity: ToastGravity.TOP,
+                            textColor: Colors.white);
+                      }
+                      else if(txtName.text != name.toString() || txtPassword.text!=password.toString()){
+                        Fluttertoast.showToast(
+                            msg: "invalid credentials",
+                            backgroundColor: Colors.red,
+                            gravity: ToastGravity.TOP,
+                            textColor: Colors.white);
+                      }
+                      else{
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => dashBoard()),
+                        );
+                      }
+                    },//since this is only a UI app
                     child: Text('SIGN IN',
                     style: TextStyle(
                       fontSize: 15,
@@ -99,30 +155,35 @@ class SignInOne extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(top: 30),
                   child: Center(
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Don't have an account?",
-                            style: TextStyle(
-                              fontFamily: 'SFUIDisplay',
-                              color: Colors.black,
-                              fontSize: 15,
-                            )
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't have an account?",
+                          style: TextStyle(
+                            fontFamily: 'SFUIDisplay',
+                            color: Colors.black,
+                            fontSize: 15,
                           ),
-                          TextSpan(
-                            text: "sign up",
+                        ),
+                        GestureDetector(
+                          onTap: () =>  Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => signUpPage()),
+                          ),
+                          child: Text(
+                            " sign up",
                             style: TextStyle(
                               fontFamily: 'SFUIDisplay',
                               color: Color(0xffff2d55),
                               fontSize: 15,
-                            )
-                          )
-                        ]
-                      ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
